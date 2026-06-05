@@ -1,25 +1,24 @@
 
 import Transaction from '../models/Transaction.js';
 
-// @desc    Add transaction (Expects title, amount, type, category from Postman/Frontend)
-// @route   POST /api/transactions
+
 export const createTransaction = async (req, res) => {
   try {
     const { title, amount, type, category, date } = req.body;
     
-    // Safety check: Ensure all required fields are present
+   
     if (!title || !amount || !type || !category) {
       return res.status(400).json({ message: "Please fill out all required fields: title, amount, type, category." });
     }
 
-    // Capture the file path provided by Cloudinary if an image was attached
+    
     const imageUrl = req.file ? req.file.path : null;
 
     const newTransaction = await Transaction.create({
       userId: req.userId, 
       title, 
-      amount: Number(amount), // Convert text from form-data into a real number
-      type: type.toLowerCase().trim(), // Clean up string data
+      amount: Number(amount),
+      type: type.toLowerCase().trim(), 
       category, 
       date: date || new Date(),
       image: imageUrl 
@@ -31,8 +30,7 @@ export const createTransaction = async (req, res) => {
   }
 };
 
-// @desc    Get user transactions
-// @route   GET /api/transactions
+
 export const getTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.find({ userId: req.userId }).sort({ date: -1 });
@@ -42,8 +40,7 @@ export const getTransactions = async (req, res) => {
   }
 };
 
-// @desc    Update transaction
-// @route   PUT /api/transactions/:id
+
 export const updateTransaction = async (req, res) => {
   try {
     const { id } = req.params;
@@ -58,8 +55,7 @@ export const updateTransaction = async (req, res) => {
   }
 };
 
-// @desc    Delete transaction
-// @route   DELETE /api/transactions/:id
+
 export const deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params;

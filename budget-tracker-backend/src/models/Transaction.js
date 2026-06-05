@@ -7,7 +7,7 @@ const transactionSchema = new mongoose.Schema({
   type: { type: String, enum: ['income', 'expense'], required: true },
   category: { type: String, required: true },
   date: { type: Date, default: Date.now },
-  image: { type: String, default: null } // 🆕 This line saves your Cloudinary image link
+  image: { type: String, default: null } 
 }, { timestamps: true });
 
 export default mongoose.model('Transaction', transactionSchema);

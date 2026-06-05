@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes Mount Points
+
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 

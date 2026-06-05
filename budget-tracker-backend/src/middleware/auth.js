@@ -2,13 +2,13 @@ import jwt from 'jsonwebtoken';
 
 const authMiddleware = (req, res, next) => {
   try {
-    // Get token from headers and pull the 2nd element after "Bearer" split
+    
     const tokenArray = req.headers.authorization?.split(" ");
     const token = tokenArray && tokenArray[1];
     
     if (!token) return res.status(401).json({ message: 'Access denied. Missing token.' });
 
-    // Verify token
+    
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decodedData?.id; 
     
