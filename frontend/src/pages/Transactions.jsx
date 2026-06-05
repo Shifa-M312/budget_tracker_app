@@ -58,8 +58,8 @@ function Transactions() {
     formData.append("type", type);
     formData.append("category", category);
     
-    if (image) {
-      formData.append("image", image);
+     if (image && image.length > 0) {
+      formData.append("image", image[0]); 
     }
 
     try {
@@ -75,7 +75,8 @@ function Transactions() {
       
       loadTransactions(); 
     } catch (err) {
-      alert("Error adding item or image size too large");
+       console.log("Real error info:", err);
+      alert("Failed to submit transaction details.");
     }
   };
 
@@ -148,7 +149,7 @@ function Transactions() {
               </label>
               <input 
                 id="receipt-upload"
-                name="image" // 🚨 FIX: This property name must match your backend storage field!
+                name="image" 
                 type="file" 
                 accept="image/*" 
                 onChange={(e) => setImage(e.target.files[0])} 
@@ -162,7 +163,7 @@ function Transactions() {
           </form>
         </div>
 
-        {/* History Logger */}
+      
         <div className="bg-white p-4 rounded shadow-md space-y-3">
           <h2 className="text-lg font-semibold mb-2">History Log</h2>
           {transactions.length === 0 ? (
