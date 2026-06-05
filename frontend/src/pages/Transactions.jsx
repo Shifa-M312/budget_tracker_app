@@ -58,8 +58,9 @@ function Transactions() {
     formData.append("type", type);
     formData.append("category", category);
     
-     if (image && image.length > 0) {
-      formData.append("image", image[0]); 
+    // 🚨 CLEAN EMBED: Grabs the single active file block safely for the network package
+    if (image) {
+      formData.append("image", image);
     }
 
     try {
@@ -75,7 +76,7 @@ function Transactions() {
       
       loadTransactions(); 
     } catch (err) {
-       console.log("Real error info:", err);
+      console.log("Submit details error container:", err);
       alert("Failed to submit transaction details.");
     }
   };
@@ -94,7 +95,6 @@ function Transactions() {
     <div className="pt-20 p-6 space-y-6 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Transactions Dashboard</h1>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-green-100 p-4 rounded shadow text-center">
           <h2 className="text-sm font-medium text-gray-600">Total Income</h2>
@@ -110,7 +110,6 @@ function Transactions() {
         </div>
       </div>
 
-      {/* Manage Categories */}
       <div className="bg-white p-4 rounded shadow-md">
         <h2 className="text-lg font-semibold mb-2">Manage Categories</h2>
         <div className="flex gap-2">
@@ -129,7 +128,6 @@ function Transactions() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Form Container */}
         <div className="bg-white p-4 rounded shadow-md space-y-4">
           <h2 className="text-lg font-semibold mb-2">Add Transaction</h2>
           <form onSubmit={handleFormSubmit} className="space-y-4">
@@ -149,10 +147,10 @@ function Transactions() {
               </label>
               <input 
                 id="receipt-upload"
-                name="image" 
+                name="image"
                 type="file" 
                 accept="image/*" 
-                onChange={(e) => setImage(e.target.files[0])} 
+                onChange={(e) => setImage(e.target.files[0])} // 🚨 FIX: Extract the raw file object right here!
                 className="text-sm text-gray-500 cursor-pointer" 
               />
             </div>
@@ -163,7 +161,6 @@ function Transactions() {
           </form>
         </div>
 
-      
         <div className="bg-white p-4 rounded shadow-md space-y-3">
           <h2 className="text-lg font-semibold mb-2">History Log</h2>
           {transactions.length === 0 ? (
