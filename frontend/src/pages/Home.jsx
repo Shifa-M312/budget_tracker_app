@@ -6,13 +6,13 @@ function Home() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Read your live production URL dynamically
+  /
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchHomeDashboardData = async () => {
       try {
-        // Fallback token lookups to match your working authentication system
+        
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         if (!token) {
           setLoading(false);
@@ -37,7 +37,7 @@ function Home() {
 
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
 
-  // Calculate matching totals from your database records
+  
   const income = safeTransactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
@@ -54,7 +54,7 @@ function Home() {
 
   return (
     <main className="pt-24 px-6 max-w-5xl mx-auto space-y-8">
-      {/* 3 Main Display Cards */}
+    
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-6 rounded-lg shadow text-white bg-gradient-to-r from-green-300 to-green-500 text-center">
           <h2 className="font-semibold">Total Income</h2>
@@ -72,7 +72,7 @@ function Home() {
         </div>
       </div>
 
-      {/* Pie Chart Section */}
+      
       <div className="bg-white p-6 rounded-lg shadow border border-gray-100 flex justify-center">
         <ExpenseChart transactions={safeTransactions} />
       </div>
