@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import api from "../api";
+import axios from "axios";
 
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -12,18 +12,27 @@ function Transactions() {
   const [category, setCategory] = useState("Food");
   const [image, setImage] = useState(null); 
 
-  const loadTransactions = () => {
-    api.get("/api/transactions")
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setTransactions(res.data);
-        }
-      })
-      .catch((err) => console.log(err));
+  // Pulls the backend URL dynamically from your .env file or falls back to localhost
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  const fetchBackendData = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) return;
+      
+      const { data } = await axios.get(`${API_BASE}/api/transactions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (Array.isArray(data)) {
+        setTransactions(data);
+      }
+    } catch (err) {
+      console.error("Failed to query live ledger:", err);
+    }
   };
 
   useEffect(() => {
-    loadTransactions();
+    fetchBackendData();
   }, []);
 
   const summary = useMemo(() => {
@@ -52,46 +61,50 @@ function Transactions() {
     e.preventDefault();
     if (!title || !amount) return;
 
-    // 🚨 BACKEND COMPLIANCE FIX: Always package using FormData to satisfy the server's multer middleware
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    
+    // Package parameters into a multipart stream for Cloudinary upload compatibility
     const formData = new FormData();
     formData.append("title", title);
     formData.append("amount", amount);
     formData.append("type", type);
     formData.append("category", category);
     
+    // Targets the single selected file securely
     if (image && image.length > 0) {
-      formData.append("image", image[0]); // Attach the selected file binary block cleanly
-    } else {
-      formData.append("image", ""); // Send an empty string placeholder if no image is chosen
+      formData.append("image", image[0]); 
     }
 
     try {
-      await api.post("/api/transactions", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+      await axios.post(`${API_BASE}/api/transactions`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
+        }
       });
       
-      // Clear inputs upon successful post
       setTitle("");
       setAmount("");
       setImage(null);
-      
       const fileInput = document.getElementById("receipt-upload");
       if (fileInput) fileInput.value = "";
-      
-      loadTransactions(); 
+
+      fetchBackendData(); 
     } catch (err) {
-      console.log("Error sending transaction payload:", err);
-      alert("Failed to submit transaction details.");
+      alert("Failed to submit transaction.");
     }
   };
 
   const handleDeleteTransaction = async (id) => {
-    if (!window.confirm("Delete this entry?")) return;
+    if (!window.confirm("Are you sure you want to remove this entry?")) return;
     try {
-      await api.delete(`/api/transactions/${id}`);
-      loadTransactions();
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.delete(`${API_BASE}/api/transactions/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchBackendData();
     } catch (err) {
-      alert("Error deleting item");
+      alert("Failed to delete record.");
     }
   };
 
@@ -99,7 +112,6 @@ function Transactions() {
     <div className="pt-20 p-6 space-y-6 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Transactions Dashboard</h1>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-green-100 p-4 rounded shadow text-center">
           <h2 className="text-sm font-medium text-gray-600">Total Income</h2>
@@ -115,7 +127,6 @@ function Transactions() {
         </div>
       </div>
 
-      {/* Categories */}
       <div className="bg-white p-4 rounded shadow-md">
         <h2 className="text-lg font-semibold mb-2">Manage Categories</h2>
         <div className="flex gap-2">
@@ -124,16 +135,15 @@ function Transactions() {
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             placeholder="New category name"
-            className="flex-1 p-2 border rounded"
+            className="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-500"
           />
-          <button onClick={handleAddCategory} className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700">
-            Add
+          <button onClick={handleAddCategory} className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition-colors">
+            Add Category
           </button>
         </div>
-        <div className="mt-2 text-sm text-gray-600">Categories: {categories.join(", ")}</div>
+        <div className="mt-2 text-sm text-gray-600">Current categories: {categories.join(", ")}</div>
       </div>
 
-      {/* Grid Inputs Form vs History */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded shadow-md space-y-4">
           <h2 className="text-lg font-semibold mb-2">Add Transaction</h2>
@@ -152,18 +162,17 @@ function Transactions() {
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">
                 Attach Voucher Receipt (Optional Cloud Upload)
               </label>
-              <input 
+              <input
                 id="receipt-upload"
-                name="image"
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => setImage(e.target.files)} 
-                className="text-sm text-gray-500 cursor-pointer" 
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files)}
+                className="text-sm text-gray-500 cursor-pointer"
               />
             </div>
 
             <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded">
-              Submit
+              Submit Transaction
             </button>
           </form>
         </div>
@@ -171,11 +180,11 @@ function Transactions() {
         <div className="bg-white p-4 rounded shadow-md space-y-3">
           <h2 className="text-lg font-semibold mb-2">History Log</h2>
           {transactions.length === 0 ? (
-            <p className="text-gray-400 italic text-center py-4">No entries found.</p>
+            <p className="text-gray-400 italic text-center py-4">No entries saved yet.</p>
           ) : (
             <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto pr-1">
               {transactions.map((t) => (
-                <div key={t._id} className="py-3 flex justify-between items-center hover:bg-gray-50 rounded px-2">
+                <div key={t._id} className="py-3 flex justify-between items-center hover:bg-gray-50 rounded px-2 transition">
                   <div>
                     <p className="font-semibold text-gray-800">{t.title}</p>
                     <p className="text-xs text-gray-400 capitalize">{t.category} • {t.type}</p>
@@ -191,7 +200,7 @@ function Transactions() {
                       </a>
                     )}
 
-                    <button onClick={() => handleDeleteTransaction(t._id)} className="text-xs text-red-500 border border-red-100 px-2 py-1 rounded hover:bg-red-50">
+                    <button onClick={() => handleDeleteTransaction(t._id)} className="text-xs text-red-500 border border-red-100 px-2 py-1 rounded hover:bg-red-50 transition">
                       Delete
                     </button>
                   </div>
