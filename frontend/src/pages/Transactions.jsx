@@ -52,21 +52,25 @@ function Transactions() {
     e.preventDefault();
     if (!title || !amount) return;
 
+    // 🚨 BACKEND COMPLIANCE FIX: Always package using FormData to satisfy the server's multer middleware
     const formData = new FormData();
     formData.append("title", title);
     formData.append("amount", amount);
     formData.append("type", type);
     formData.append("category", category);
     
-    // 🚨 CLEAN EMBED: Grabs the single active file block safely for the network package
-    if (image) {
-      formData.append("image", image);
+    if (image && image.length > 0) {
+      formData.append("image", image[0]); // Attach the selected file binary block cleanly
+    } else {
+      formData.append("image", ""); // Send an empty string placeholder if no image is chosen
     }
 
     try {
       await api.post("/api/transactions", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
+      
+      // Clear inputs upon successful post
       setTitle("");
       setAmount("");
       setImage(null);
@@ -76,7 +80,7 @@ function Transactions() {
       
       loadTransactions(); 
     } catch (err) {
-      console.log("Submit details error container:", err);
+      console.log("Error sending transaction payload:", err);
       alert("Failed to submit transaction details.");
     }
   };
@@ -95,6 +99,7 @@ function Transactions() {
     <div className="pt-20 p-6 space-y-6 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Transactions Dashboard</h1>
 
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-green-100 p-4 rounded shadow text-center">
           <h2 className="text-sm font-medium text-gray-600">Total Income</h2>
@@ -110,6 +115,7 @@ function Transactions() {
         </div>
       </div>
 
+      {/* Categories */}
       <div className="bg-white p-4 rounded shadow-md">
         <h2 className="text-lg font-semibold mb-2">Manage Categories</h2>
         <div className="flex gap-2">
@@ -127,6 +133,7 @@ function Transactions() {
         <div className="mt-2 text-sm text-gray-600">Categories: {categories.join(", ")}</div>
       </div>
 
+      {/* Grid Inputs Form vs History */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded shadow-md space-y-4">
           <h2 className="text-lg font-semibold mb-2">Add Transaction</h2>
@@ -150,7 +157,7 @@ function Transactions() {
                 name="image"
                 type="file" 
                 accept="image/*" 
-                onChange={(e) => setImage(e.target.files[0])} // 🚨 FIX: Extract the raw file object right here!
+                onChange={(e) => setImage(e.target.files)} 
                 className="text-sm text-gray-500 cursor-pointer" 
               />
             </div>
