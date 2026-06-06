@@ -12,7 +12,7 @@ function Transactions() {
   const [category, setCategory] = useState("Food");
   const [image, setImage] = useState(null); 
 
-  // Pulls the backend URL dynamically from your .env file or falls back to localhost
+
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const fetchBackendData = async () => {
@@ -63,14 +63,14 @@ function Transactions() {
 
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     
-    // Package parameters into a multipart stream for Cloudinary upload compatibility
+ 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("amount", amount);
     formData.append("type", type);
     formData.append("category", category);
     
-    // Targets the single selected file securely
+   
     if (image && image.length > 0) {
       formData.append("image", image[0]); 
     }
