@@ -71,8 +71,8 @@ function Transactions() {
     formData.append("category", category);
     
    
-    if (image && image.length > 0) {
-      formData.append("image", image[0]); 
+    if (image) {
+      formData.append("image", image); 
     }
 
     try {
@@ -91,6 +91,7 @@ function Transactions() {
 
       fetchBackendData(); 
     } catch (err) {
+      console.error("Submission Error Details:", err.response?.data || err.message);
       alert("Failed to submit transaction.");
     }
   };
@@ -166,7 +167,7 @@ function Transactions() {
                 id="receipt-upload"
                 type="file"
                 accept="image/*"
-                onChange={(e) => setImage(e.target.files)}
+                onChange={(e) => setImage(e.target.files[0])}
                 className="text-sm text-gray-500 cursor-pointer"
               />
             </div>
