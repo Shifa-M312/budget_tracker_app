@@ -71,8 +71,8 @@ function Transactions() {
     formData.append("category", category);
     
    
-    if (image) {
-      formData.append("image", image); 
+    if (image && image.length > 0) {
+      formData.append("image", image[0]); 
     }
 
     try {
