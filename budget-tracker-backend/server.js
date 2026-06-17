@@ -11,10 +11,15 @@ const app = express();
 
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: ['https://vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 
-app.options('/*path', cors()); 
+app.options('/*', cors()); 
 
 app.use(express.json());
 
