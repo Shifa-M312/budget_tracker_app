@@ -14,7 +14,7 @@ function Signup() {
 
     try {
       // Direct, absolute registration endpoint link
-      await axios.post("https://budget-tracker-app-skpt.onrender.com", {
+      await axios.post("https://budget-tracker-app-skpt.onrender.com/api/auth/register", {
         name,
         email,
         password,
