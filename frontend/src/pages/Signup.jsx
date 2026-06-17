@@ -15,7 +15,7 @@ function Signup() {
 
     try {
       
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await axios.post("https://dashboard.render.com/web/srv-d8hjptrbc2fs73c03ms0/env", {
         name,
         email,
         password,
