@@ -12,13 +12,12 @@ function Login() {
     e.preventDefault();
 
     try {
-      
-      const { data } = await axios.post("https://budget-tracker-app-skpt.onrender.com", {
+      // Direct, absolute login endpoint link
+      const { data } = await axios.post("https://onrender.com", {
         email,
         password,
       });
 
-      
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("loggedIn", "true");
@@ -26,7 +25,6 @@ function Login() {
       alert("Login successful");
       navigate("/transactions"); 
     } catch (err) {
-      
       alert(err.response?.data?.message || "Invalid credentials. Try again.");
     }
   };

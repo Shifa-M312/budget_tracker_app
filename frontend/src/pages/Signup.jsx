@@ -5,7 +5,6 @@ import axios from "axios";
 function Signup() {
   const navigate = useNavigate();
 
- 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,8 +13,8 @@ function Signup() {
     e.preventDefault();
 
     try {
-      
-      await axios.post("https://budget-tracker-app-skpt.onrender.com", {
+      // Direct, absolute registration endpoint link
+      await axios.post("https://onrender.com", {
         name,
         email,
         password,
@@ -24,7 +23,6 @@ function Signup() {
       alert("Signup successful! Please log in.");
       navigate("/login");
     } catch (err) {
-      
       alert(err.response?.data?.message || "Signup failed. Try again.");
     }
   };
@@ -37,7 +35,6 @@ function Signup() {
       >
         <h2 className="text-xl font-bold mb-4">Sign Up</h2>
 
-        
         <input
           type="text"
           placeholder="Full Name"
