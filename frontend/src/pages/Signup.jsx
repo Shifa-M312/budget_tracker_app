@@ -15,7 +15,7 @@ function Signup() {
 
     try {
       
-      await axios.post("https://dashboard.render.com/web/srv-d8hjptrbc2fs73c03ms0/env", {
+      await axios.post("https://budget-tracker-app-skpt.onrender.com", {
         name,
         email,
         password,
