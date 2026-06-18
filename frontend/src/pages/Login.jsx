@@ -13,7 +13,7 @@ function Login() {
 
     try {
       // Direct, absolute login endpoint link
-      const { data } = await axios.post("https://budget-tracker-app-skpt.onrender.com", {
+      const { data } = await axios.post("https://budget-tracker-app-skpt.onrender.com/api/auth/login", {
         email,
         password,
       });
